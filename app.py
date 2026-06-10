@@ -1,4 +1,6 @@
 from flask import Flask, render_template, request
+from huggingface_hub import hf_hub_download
+import joblib
 import numpy as np
 import joblib
 import os
@@ -9,11 +11,31 @@ app = Flask(__name__)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR = os.path.join(BASE_DIR, "model")
 
-rf_model      = joblib.load(os.path.join(MODEL_DIR, "random_forest_model.pkl"))
-scaler        = joblib.load(os.path.join(MODEL_DIR, "scaler.pkl"))
-label_encoders = joblib.load(os.path.join(MODEL_DIR, "label_encoders.pkl"))
+MODEL_REPO = "NeyYudhistira/flask-kredit-model"
 
+rf_model = joblib.load(
+    hf_hub_download(
+        repo_id=MODEL_REPO,
+        repo_type="dataset",
+        filename="random_forest_model.pkl"
+    )
+)
 
+scaler = joblib.load(
+    hf_hub_download(
+        repo_id=MODEL_REPO,
+        repo_type="dataset",
+        filename="scaler.pkl"
+    )
+)
+
+label_encoders = joblib.load(
+    hf_hub_download(
+        repo_id=MODEL_REPO,
+        repo_type="dataset",
+        filename="label_encoders.pkl"
+    )
+)
 def encode_kategori(col, value):
     """Encode nilai kategorikal menggunakan LabelEncoder yang sudah dilatih."""
     le = label_encoders.get(col)
